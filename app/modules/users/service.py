@@ -1,6 +1,5 @@
 import bcrypt
 from app.modules.users.models import userTable
-idCounter = 0
 
 class userManagement:
 
@@ -10,51 +9,47 @@ class userManagement:
     # signup
     async def signUp(self, firstName, lastName, email, username, password, confirmedPass, role):
         if await userTable.find_one({"email": email}):
-            return "User Already Exists"
+            return {"error": "User Already Exists"}
 
         if password != confirmedPass:
-            return "Password Mismatch"
+            return {"error": "Password Mismatch"}
 
         if await userTable.find_one({"username": username}):
-            return "Username Already Exists"
+            return {"error": "Username Already Exists"}
 
-        global idCounter
-        passwo = bcrypt.hashpw(password.encode("utf8"), bcrypt.gensalt())
+        passwo = bcrypt.hashpw(password.encode("utf8"), bcrypt.gensalt()).decode("utf8")
         user = {
-            "_id": idCounter,
             "First Name": firstName,
             "Last Name": lastName ,
             "email": email,
             "username": username,
             "password": passwo,
-            "Confirmed pass": confirmedPass,
             "role": role
         }
         await userTable.insert_one(user)
-        idCounter += 1
-        return "Sign Up Successfully!"
+        return {"message": "Sign Up Successfully!"}
 
     # login email
     async def loginByEmail(self, email, password):
         user = await userTable.find_one({"email": email})
         check = user["password"].encode("utf8")
-        if await user and bcrypt.checkpw(password.encode("utf8"), check):
-            return "Logged In"
+        if user and bcrypt.checkpw(password.encode("utf8"), check):
+            return {"message": "Logged In"}
         else:
-            return "Login Failed"
+            return {"error": "Login Failed"}
 
     # login username
     async def loginByUsername(self, username, password):
         user = await userTable.find_one({"username": username})
         check = user["password"].encode("utf8")
-        if await user and bcrypt.checkpw(password.encode("utf8"), check):
-            return "Logged In"
+        if user and bcrypt.checkpw(password.encode("utf8"), check):
+            return {"message": "Logged In"}
         else:
-            return "Login Failed"
+            return {"error": "Login Failed"}
 
 userManagement = userManagement()
 
-if "@" in userStr:
-    userManagement.loginByEmail(userStr, password)
-else:
-    userManagement.loginByUsername(userStr, password)
+# if "@" in userStr:
+#     userManagement.loginByEmail(userStr, password)
+# else:
+#     userManagement.loginByUsername(userStr, password)
