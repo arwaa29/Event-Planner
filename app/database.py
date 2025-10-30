@@ -1,7 +1,11 @@
+import os
 import pymongo
 import bcrypt
+from dotenv import load_dotenv
 
-client = pymongo.MongoClient("mongodb+srv://nourtarek885_db_user:MyStrongPassword123@cluster0.wknjzi0.mongodb.net/myAppDB?retryWrites=true&w=majority&appName=Cluster0")
+load_dotenv()
+URI = os.getenv("MONGO_URI")
+client = pymongo.MongoClient(URI)
 
 dataBase = client['EventPlanner']
 userTable = dataBase["user"]
