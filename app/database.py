@@ -7,4 +7,4 @@ load_dotenv()  # loads variables from .env file
 
 MONGO_URI = os.getenv("MONGO_URI")
 client = AsyncIOMotorClient(MONGO_URI)
-db = client["eventplanner"]  # database name
+dataBase = client['EventPlanner']
