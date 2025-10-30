@@ -1,8 +1,7 @@
-import certifi
 import pymongo
 import bcrypt
 
-client = pymongo.MongoClient("mongodb+srv://nourtarek885_db_user:MyStrongPassword123@cluster0.wknjzi0.mongodb.net/myAppDB?retryWrites=true&w=majority&appName=Cluster0", tls=True, tlsCAFile=certifi.where())
+client = pymongo.MongoClient("mongodb+srv://nourtarek885_db_user:MyStrongPassword123@cluster0.wknjzi0.mongodb.net/myAppDB?retryWrites=true&w=majority&appName=Cluster0")
 
 dataBase = client['EventPlanner']
 userTable = dataBase["user"]
