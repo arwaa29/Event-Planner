@@ -1,4 +1,3 @@
-from app.database import client
+from app.database import dataBase
 
-dataBase = client['EventPlanner']
 userTable = dataBase["user"]
