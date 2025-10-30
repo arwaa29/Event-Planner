@@ -8,42 +8,51 @@ class userManagement:
     # Without self, Python would not know which object's properties you want to access
 
     # signup
-    def signUp(self, name, email, username, password):
-        if userTable.find_one({"email": email}):
-            print("User Already Exists")
-            return
+    async def signUp(self, firstName, lastName, email, username, password, confirmedPass, role):
+        if await userTable.find_one({"email": email}):
+            return "User Already Exists"
+
+        if password != confirmedPass:
+            return "Password Mismatch"
+
+        if await userTable.find_one({"username": username}):
+            return "Username Already Exists"
+
         global idCounter
-        user = {"_id": idCounter, "name": name, "email": email, "username": username, "password": bcrypt.hashpw(password.encode("utf8"), bcrypt.gensalt())}
-        userTable.insert_one(user)
+        passwo = bcrypt.hashpw(password.encode("utf8"), bcrypt.gensalt())
+        user = {
+            "_id": idCounter,
+            "First Name": firstName,
+            "Last Name": lastName ,
+            "email": email,
+            "username": username,
+            "password": passwo,
+            "Confirmed pass": confirmedPass,
+            "role": role
+        }
+        await userTable.insert_one(user)
         idCounter += 1
-        print("Sign Up Successfully!")
+        return "Sign Up Successfully!"
 
     # login email
-    def loginByEmail(self, email, password):
-        if userTable.find_one({"email": email}):
-            print("Logged In")
+    async def loginByEmail(self, email, password):
+        user = await userTable.find_one({"email": email})
+        check = user["password"].encode("utf8")
+        if await user and bcrypt.checkpw(password.encode("utf8"), check):
+            return "Logged In"
         else:
-            print("Login Failed")
+            return "Login Failed"
 
     # login username
-    def loginByUsername(self, username,password):
-        if userTable.find_one({"username": username}):
-            print("Logged In")
+    async def loginByUsername(self, username, password):
+        user = await userTable.find_one({"username": username})
+        check = user["password"].encode("utf8")
+        if await user and bcrypt.checkpw(password.encode("utf8"), check):
+            return "Logged In"
         else:
-            print("Login Failed")
-
-# test
-# user1 = {"name": "Nour","email":"Nourtarek885@gmail.com", "username": "Nourtarek885","password":""}
-# userTable.insert_one(user1)
-# userTable.insert_one({"name":"Arwa", "email":"Arwa@gmail.com"})
-# eventTable.insert_one({"title":"", "date":"", "time": "", "location": "", "description": ""})
-# print(dataBase.list_collection_names())
+            return "Login Failed"
 
 userManagement = userManagement()
-userManagement.signUp("Nour", "nour@gmail.com", "nourtarek885", "NourTarek11")
-
-userStr = input("Enter your username or email: ")
-password = input("Enter your password: ")
 
 if "@" in userStr:
     userManagement.loginByEmail(userStr, password)
