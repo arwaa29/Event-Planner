@@ -1,50 +1,43 @@
-import bcrypt
-from app.modules.users.models import userTable
+from app.database import dataBase
+from passlib.context import CryptContext
+from app.auth.jwt_handler import createAccessToken
+from app.modules.users.models import user_helper
 
-class userManagement:
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-    # All classes have a built-in method called __init__(), which is always executed when the class is being initiated.
-    # Without self, Python would not know which object's properties you want to access
+async def signUp(first_name: str, last_name: str, email: str, username: str, password: str,role: str):
+    user_exit = await dataBase.users.findone({"email": email})
+    if user_exit:
+        return {"message": "Email already exists"}
 
-    # signup
-    async def signUp(self, firstName, lastName, email, username, password, confirmedPass, role):
-        if await userTable.find_one({"email": email}):
-            return {"error": "User Already Exists"}
+    user_exit = await dataBase.users.find_one({"username": username})
+    if user_exit:
+        return {"message": "Username already exists"}
 
-        if password != confirmedPass:
-            return {"error": "Password Mismatch"}
+    hashed_pass = pwd_context.hash(password)
+    newUser = {"email":email, "first_name":first_name,
+               "last_name":last_name, "username":username,
+               "password":hashed_pass, "role":role}
+    result = await dataBase.users.insert_one(newUser)
+    createdUser = await dataBase.users.find_one({"_id": result.inserted_id})
 
-        if await userTable.find_one({"username": username}):
-            return {"error": "Username Already Exists"}
+    token = createAccessToken({"sub":str(createdUser["_id"])})
+    return {"message": "User registered successfully", "token": token}
 
-        passwo = bcrypt.hashpw(password.encode("utf8"), bcrypt.gensalt()).decode("utf8")
-        user = {
-            "first_name": firstName,
-            "last_name": lastName ,
-            "email": email,
-            "username": username,
-            "password": passwo,
-            "role": role
-        }
-        await userTable.insert_one(user)
-        return {"message": "Sign Up Successfully!"}
+async def loginByEmail(email: str, password: str):
+    user = await dataBase.users.find_one({"email": email})
+    if not user:
+        return {"message": "Invalid credentials"}
+    if not pwd_context.verify(password, user["password"]):
+        return {"message": "Invalid credentials"}
+    token = createAccessToken({"sub":str(user["_id"])})
+    return {"message": "Logged in successfully", "token": token}
 
-    # login email
-    async def loginByEmail(self, email, password):
-        user = await userTable.find_one({"email": email})
-        check = user["password"].encode("utf8")
-        if user and bcrypt.checkpw(password.encode("utf8"), check):
-            return {"message": "Logged In"}
-        else:
-            return {"error": "Login Failed"}
-
-    # login username
-    async def loginByUsername(self, username, password):
-        user = await userTable.find_one({"username": username})
-        check = user["password"].encode("utf8")
-        if user and bcrypt.checkpw(password.encode("utf8"), check):
-            return {"message": "Logged In"}
-        else:
-            return {"error": "Login Failed"}
-
-userManagement = userManagement()
+async def loginByUsername(username: str, password: str):
+    user = await dataBase.users.find_one({"username": username})
+    if not user:
+        return {"message": "Invalid credentials"}
+    if not pwd_context.verify(password, user["password"]):
+        return {"message": "Invalid credentials"}
+    token = createAccessToken({"sub":str(user["_id"])})
+    return {"message": "Logged in successfully", "token": token}
