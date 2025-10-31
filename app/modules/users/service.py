@@ -31,7 +31,8 @@ async def loginByEmail(email: str, password: str):
     if not pwd_context.verify(password, user["password"]):
         return {"message": "Invalid credentials"}
     token = createAccessToken({"sub":str(user["_id"])})
-    return {"message": "Logged in successfully", "token": token}
+    userData = user_helper(user)
+    return {"message": "Logged in successfully", "user":userData, "token": token}
 
 async def loginByUsername(username: str, password: str):
     user = await dataBase.users.find_one({"username": username})
@@ -40,4 +41,5 @@ async def loginByUsername(username: str, password: str):
     if not pwd_context.verify(password, user["password"]):
         return {"message": "Invalid credentials"}
     token = createAccessToken({"sub":str(user["_id"])})
-    return {"message": "Logged in successfully", "token": token}
+    userData = user_helper(user)
+    return {"message": "Logged in successfully", "user":userData, "token": token}
