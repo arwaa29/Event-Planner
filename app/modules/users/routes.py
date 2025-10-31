@@ -1,16 +1,26 @@
-from fastapi import APIRouter
-from app.modules.users.service import userManagement
-from app.modules.users.schemas import Signup, Login
+from fastapi import APIRouter, HTTPException, status
+from app.modules.users.service import signUp, loginByEmail, loginByUsername
+from app.modules.users.schemas import Signup, Login, userResponse, RegisterResponse, LoginResponse
 
 userRouter = APIRouter(prefix="/users", tags=["Users"])
 
-@userRouter.post("/signup")
-async def signup(User: Signup):
-    return await userManagement.signUp(User.first_name, User.last_name, User.email, User.username, User.password, User.confirmedPass, User.role)
+@userRouter.post("/register", response_model= RegisterResponse)
+async def register(request: Signup):
+    result = await signUp(request.first_name, request.last_name, request.email,
+                            request.username, request.password, request.role)
+    if "token" not in result:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=result["message"])
+    return result
 
-@userRouter.post("/login")
-async def login(User: Login):
-    if "@" in User.user:
-       return await userManagement.loginByEmail(User.email, User.password)
+@userRouter.post("/login", response_model= LoginResponse)
+async def login(request: Login):
+    if request.email:
+        result = await loginByEmail(request.email, request.password)
+    elif request.username:
+        result = await loginByUsername(request.username, request.password)
     else:
-       return await userManagement.loginByUsername(User.username, User.password)
+        raise HTTPException(status_code=400, detail="Email or username is required")
+
+    if "token" not in result:
+        raise HTTPException(status_code=status.HTTP_401_BAD_REQUEST, detail=result["message"])
+    return result
