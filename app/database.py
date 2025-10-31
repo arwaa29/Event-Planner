@@ -7,3 +7,6 @@ load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
 client = AsyncIOMotorClient(MONGO_URI)
 dataBase = client['EventPlanner']
+
+# Collections
+user_collection = dataBase["users"]
