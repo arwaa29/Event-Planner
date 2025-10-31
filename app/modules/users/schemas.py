@@ -29,6 +29,7 @@ class RegisterResponse(BaseModel):
 class LoginResponse(BaseModel):
     message: str
     token: str
+    user: userResponse
 
 model_config = {
     "from_attributes": True
