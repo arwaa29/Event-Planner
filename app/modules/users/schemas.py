@@ -10,8 +10,8 @@ class Signup(BaseModel):
         role: Optional[str] = "attendee"
 
 class Login(BaseModel):
-    email: EmailStr
-    username: str
+    email: Optional[EmailStr] = None
+    username: Optional[str] = None
     password: str
 
 class userResponse(BaseModel):
