@@ -22,5 +22,5 @@ async def login(request: Login):
         raise HTTPException(status_code=400, detail="Email or username is required")
 
     if "token" not in result:
-        raise HTTPException(status_code=status.HTTP_401_BAD_REQUEST, detail=result["message"])
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=result["message"])
     return result
