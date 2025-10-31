@@ -19,8 +19,8 @@ class userManagement:
 
         passwo = bcrypt.hashpw(password.encode("utf8"), bcrypt.gensalt()).decode("utf8")
         user = {
-            "First Name": firstName,
-            "Last Name": lastName ,
+            "first_name": firstName,
+            "last_name": lastName ,
             "email": email,
             "username": username,
             "password": passwo,
@@ -48,8 +48,3 @@ class userManagement:
             return {"error": "Login Failed"}
 
 userManagement = userManagement()
-
-# if "@" in userStr:
-#     userManagement.loginByEmail(userStr, password)
-# else:
-#     userManagement.loginByUsername(userStr, password)
