@@ -2,17 +2,20 @@ from app.database import dataBase
 from passlib.context import CryptContext
 from app.auth.jwt_handler import createAccessToken
 from app.modules.users.models import user_helper
+from typing import Optional
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 async def signUp(first_name: str, last_name: str, email: str, username: str, password: str,role: str):
-    user_exit = await dataBase.users.findone({"email": email})
+    user_exit = await dataBase.users.find_one({"email": email})
     if user_exit:
         return {"message": "Email already exists"}
 
     user_exit = await dataBase.users.find_one({"username": username})
     if user_exit:
         return {"message": "Username already exists"}
+
+    print(password)
 
     hashed_pass = pwd_context.hash(password)
     newUser = {"email":email, "first_name":first_name,
