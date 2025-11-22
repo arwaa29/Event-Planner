@@ -1,14 +1,12 @@
 from app.database import dataBase
 from app.auth.jwt_handler import createAccessToken
 from app.modules.events.models import event_helper
-from datetime import datetime
 
 # user = get_current_user(request)
-async def createEvent(title: str, location: str, description: str, user: str):
-    dt = datetime.now()
+async def createEvent(title: str, date: str, time: str, location: str, description: str, user: str):
 
-    newEvent = {"title":title, "date":dt.strftime("%Y-%m-%d"),
-               "time":dt.strftime("%H:%M:%S"), "location":location,
+    newEvent = {"title":title, "date":date,
+               "time": time, "location":location,
                 "description":description, "organizer":user, "attendees": []}
     result = await dataBase.Events.insert_one(newEvent)
     createdEvent = await dataBase.Events.find_one({"_id": result.inserted_id})
