@@ -10,7 +10,7 @@ dataBase = client['EventPlanner']
 
 # Collections
 user_collection = dataBase["users"]
-
+user_collection2 = dataBase["Events"]
 
 # import motor.motor_asyncio
 # import asyncio
