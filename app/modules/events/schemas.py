@@ -15,7 +15,7 @@ class InviteUser(BaseModel):
 
 class EventResponse(BaseModel):
     message: str
-    
+
 model_config = {
     "from_attributes": True
 }
