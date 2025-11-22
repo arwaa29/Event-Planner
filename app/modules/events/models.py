@@ -6,4 +6,6 @@ def event_helper(event) -> dict:
         "time": event["time"],
         "location": event["location"],
         "description": event["description"],
+        "organizer": event["organizer"],
+        "attendees": event["attendees"],
     }
