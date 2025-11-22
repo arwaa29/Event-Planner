@@ -20,7 +20,7 @@ async def viewOrganizedEvent(user):
     return dataBase.Events.find({"organizer":user})
 
 async def viewinvitedEvent(user):
-    return dataBase.Events.find({"attendees":user})
+    return dataBase.Events.find({"attendees.user":user})
 
 async def deleteEvent(user,event_id):
     delete = await dataBase.Events.delete_one({"_id": event_id, "organizer":user})
@@ -30,4 +30,4 @@ async def deleteEvent(user,event_id):
         return {"message": "Not authorized to delete this event or event does not exist"}
 
 async def inviteUser(user,event_id):
-    await dataBase.Events.update_one({"_id": event_id},{"$push":{"attendees":user}})
+    await dataBase.Events.update_one({"_id": event_id},{"$push":{"attendees":{"user": user, "status": "Not Responded"}}})
