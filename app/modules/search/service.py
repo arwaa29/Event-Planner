@@ -7,7 +7,7 @@ async def searchByName(title: str) -> dict:
 async def searchByTaskDescrip(task: str) -> dict:
     return await dataBase.Events.find({"description": {"$regex": task}})
 
-async def dataFiltering(date: str) -> dict:
+async def dateFiltering(date: str) -> dict:
     return await dataBase.Events.find({"date":{"$regex": date}})
 
 async def userFiltering(role: str) -> dict:
@@ -19,6 +19,6 @@ async def combination(title = None, description = None, date = None, role = None
     if description:
         searchByTaskDescrip(description)
     if date:
-        dataFiltering(date)
+        dateFiltering(date)
     if role:
         userFiltering(role)
