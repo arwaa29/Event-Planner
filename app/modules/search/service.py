@@ -11,7 +11,7 @@ async def dataFiltering(date: str) -> dict:
     return await dataBase.Events.find({"date":{"$regex": date}})
 
 async def userFiltering(role: str) -> dict:
-    return await dataBase.Events.find({"attendees.user":{"$regex": role}})
+    return await dataBase.Events.find({"attendees.role":{"$regex": role}})
 
 async def combination(title = None, description = None, date = None, role = None) -> dict:
     if title:
