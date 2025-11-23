@@ -1,13 +1,13 @@
 from pydantic import BaseModel
+from datetime import date, time
 
 class CreateEvent(BaseModel):
         title: str
-        date: str
-        time: str
+        date: date
+        time: time
         location: str
         description: str
-        organizer: str
-        attendees: list[dict]
+
 
 class InviteUser(BaseModel):
     event_id: str
