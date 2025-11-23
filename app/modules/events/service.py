@@ -1,18 +1,33 @@
-from app.database import dataBase
+from app.database import dataBase, events_collection, event_attendees_collection
 from app.auth.jwt_handler import createAccessToken
 from app.modules.events.models import event_helper
+from bson import ObjectId
 
 # user = get_current_user(request)
-async def createEvent(title: str, date: str, time: str, location: str, description: str, user: str):
+async def createEvent(event_data, user_id: str):
 
-    newEvent = {"title":title, "date":date,
-               "time": time, "location":location,
-                "description":description, "organizer":user, "attendees": []}
-    result = await dataBase.Events.insert_one(newEvent)
-    createdEvent = await dataBase.Events.find_one({"_id": result.inserted_id})
+    newEvent = {"title":event_data.title, "date":event_data.date,
+               "time": event_data.time, "location":event_data.location,
+                "description":event_data.description, "organizer_id":user_id}
+    result = await events_collection.insert_one(newEvent)
+    event_id = result.inserted_id
 
-    token = createAccessToken({"sub":str(createdEvent["_id"])})
-    return {"message": "Event Created Successfully", "token": token}
+    # Add organizer to attendees collection
+    await event_attendees_collection.insert_one({
+        "event_id": str(event_id),
+        "user_id": user_id,
+        "role": "organizer",
+        "status": "going"
+    })
+
+    created_event = await events_collection.find_one({"_id": event_id})
+
+    return {
+        "message": "Event created successfully",
+        "event": created_event
+    }
+
+
 
 async def viewOrganizedEvent(user):
     return dataBase.Events.find({"organizer":user})
