@@ -24,9 +24,11 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         )
 
     #hn7tago 3shan el event
+    #get user id stored in token
     user_id = payload["sub"]  # user ID inside the token
 
     #Fetch user from DB
+    #fetch user using user id that we got from token
     user = await dataBase.users.find_one({"_id": user_id})
 
     if not user:
@@ -35,4 +37,4 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             detail="User not found",
         )
 
-    return user    # return directly to route
+    return user    # return all user data to route
