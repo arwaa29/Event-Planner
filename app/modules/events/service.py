@@ -29,11 +29,36 @@ async def createEvent(event_data, user_id: str):
 
 
 
-async def viewOrganizedEvent(user):
-    return dataBase.Events.find({"organizer":user})
+async def viewOrganizedEvent(user_id: str):
+    #we will get all events that this user is an organizer in it
+    events_cursor = event_attendees_collection.find({
+        "user_id": user_id,
+        "role": "organizer"})
 
-async def viewinvitedEvent(user):
-    return dataBase.Events.find({"attendees.user":user})
+    events = []
+
+    #hyrga3 cursor object so we will loop on it to read
+    async for item in events_cursor:
+        event = await events_collection.find_one({"_id": ObjectId(item["event_id"])})
+        if event:
+            events.append(event_helper(event))
+
+    return events
+
+
+async def viewinvitedEvent(user_id: str):
+    events_cursor = event_attendees_collection.find({
+        "user_id": user_id,
+        "role": "attendee"})
+
+    events = []
+
+    async for item in events_cursor:
+        event = await events_collection.find_one({"_id": ObjectId(item["event_id"])})
+        if event:
+            events.append(event_helper(event))
+
+    return events
 
 async def deleteEvent(user,event_id):
     delete = await dataBase.Events.delete_one({"_id": event_id, "organizer":user})
