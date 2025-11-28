@@ -14,13 +14,16 @@ events_collection = dataBase["events"]
 event_attendees_collection = dataBase["event_attendees"]
 
 
-# import motor.motor_asyncio
 # import asyncio
+# from motor.motor_asyncio import AsyncIOMotorClient
+# import os
+# from dotenv import load_dotenv
 #
-# MONGO_URI = "mongodb+srv://nourtarek885_db_user:MyStrongPassword123@cluster0.wknjzi0.mongodb.net/myAppDB?retryWrites=true&w=majority&appName=Cluster0"
+# load_dotenv()
+# MONGO_URI = os.getenv("MONGO_URI")
 #
 # async def test_connection():
-#     client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI, tls=True, tlsAllowInvalidCertificates=True)
+#     client = AsyncIOMotorClient(MONGO_URI, tls=True)
 #     db = client["EventPlanner"]
 #     try:
 #         await db.command("ping")
