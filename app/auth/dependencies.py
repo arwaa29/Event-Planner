@@ -38,4 +38,4 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             detail="User not found",
         )
 
-    return user    # return all user data to route
+    return user    # return all user data to routes
