@@ -1,4 +1,4 @@
-from app.database import dataBase
+from app.database import dataBase, user_collection
 from passlib.context import CryptContext
 from app.auth.jwt_handler import createAccessToken
 from app.modules.users.models import user_helper
@@ -7,11 +7,11 @@ from typing import Optional
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 async def signUp(first_name: str, last_name: str, email: str, username: str, password: str):
-    user_exit = await dataBase.users.find_one({"email": email})
+    user_exit = await user_collection.find_one({"email": email})
     if user_exit:
         return {"message": "Email already exists"}
 
-    user_exit = await dataBase.users.find_one({"username": username})
+    user_exit = await user_collection.find_one({"username": username})
     if user_exit:
         return {"message": "Username already exists"}
 
@@ -21,14 +21,14 @@ async def signUp(first_name: str, last_name: str, email: str, username: str, pas
     newUser = {"email":email, "first_name":first_name,
                "last_name":last_name, "username":username,
                "password":hashed_pass, "role": None}
-    result = await dataBase.users.insert_one(newUser)
-    createdUser = await dataBase.users.find_one({"_id": result.inserted_id})
+    result = await user_collection.insert_one(newUser)
+    createdUser = await user_collection.find_one({"_id": result.inserted_id})
 
     token = createAccessToken({"sub":str(createdUser["_id"])})
     return {"message": "User registered successfully", "token": token}
 
 async def loginByEmail(email: str, password: str):
-    user = await dataBase.users.find_one({"email": email})
+    user = await user_collection.find_one({"email": email})
     if not user:
         return {"message": "Invalid credentials"}
     if not pwd_context.verify(password, user["password"]):
@@ -38,7 +38,7 @@ async def loginByEmail(email: str, password: str):
     return {"message": "Logged in successfully", "user":userData, "token": token}
 
 async def loginByUsername(username: str, password: str):
-    user = await dataBase.users.find_one({"username": username})
+    user = await user_collection.find_one({"username": username})
     if not user:
         return {"message": "Invalid credentials"}
     if not pwd_context.verify(password, user["password"]):
