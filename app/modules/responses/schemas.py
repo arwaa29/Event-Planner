@@ -1,6 +1,13 @@
-from typing import Literal
 from pydantic import BaseModel
+from typing import Literal
 
-class UpdateStatus(BaseModel):
-        event_id: str
-        status: Literal["Going", "Maybe", "Not Going"]
+class InvitationResponse(BaseModel):
+    event_id: str
+    status: Literal["going", "not going", "maybe"]
+
+    class Config:
+        orm_mode = True
+
+
+class AttendeesList(BaseModel):
+    event_id: str
