@@ -7,8 +7,8 @@ from fastapi import HTTPException
 # user = get_current_user(request)
 async def createEvent(event_data, user_id: str):
 
-    newEvent = {"title":event_data.title, "date":event_data.date,
-               "time": event_data.time, "location":event_data.location,
+    newEvent = {"title":event_data.title, "date":str(event_data.date),
+               "time": str(event_data.time), "location":event_data.location,
                 "description":event_data.description, "organizer_id":user_id}
     result = await events_collection.insert_one(newEvent)
     event_id = result.inserted_id
