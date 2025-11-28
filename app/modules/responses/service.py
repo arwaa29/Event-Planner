@@ -1,22 +1,42 @@
-from app.database import dataBase
+from app.database import dataBase, event_attendees_collection, events_collection
 from bson import ObjectId
+from fastapi import HTTPException
+from app.modules.responses.models import attendee_helper
 
-async def updateStatus(user: str ,event_id: str ,status: str):
-    if status not in ["Going", "Maybe", "Not Going"]:
-        return {"message": "Invalid status"}
-    event_id = ObjectId(event_id)
-    event = await dataBase.Events.find_one({"_id": event_id, "attendees.user": user})
+async def RespondEvent( respond_data, user_id: str):
+    attendee = await event_attendees_collection.find_one({
+        "event_id": respond_data.event_id,
+        "user_id": user_id,
+        "role": "attendee"
+    })
+
+    if not attendee:
+        raise HTTPException(status_code=403, detail="you aren't invited to this event ")
+
+    # going, not going, maybe el user hy5tar fl ui
+    await event_attendees_collection.update_one(
+        {"event_id": respond_data.event_id, "user_id": user_id},
+        {"$set": {"status": respond_data.status}}
+    )
+
+    return {"message": f"your response has been set to{respond_data.status}"}
+
+async def viewEventAttendees(event_id: str, user_id:str):
+    event = await events_collection.find_one({"_id": ObjectId(event_id)})
     if not event:
-        return {"message": "You are not invited"}
+        raise HTTPException(status_code=404, detail="Event not found")
+    if str(event["organizer_id"]) != user_id:
+        raise HTTPException(status_code=401, detail="Not authorized to view attendees")
 
-    await dataBase.Events.update_one({"_id": event_id, "attendees.user": user},
-                                    {"$set": {"attendees.$.status": status}})
-    return {"message": "Status updated successfully"}
+    attendees_cursor = event_attendees_collection.find(
+        {
+            "event_id": event_id,
+            "role": "attendee"
+        }
+    )
 
-async def viewAttendees(user: str, event_id: str):
-    event_id = ObjectId(event_id)
-    event = await dataBase.Events.find_one({"_id": event_id, "organizer": user})
-    if not event :
-        return {"message": "You are not authorized to view attendees"}
+    attendees = []
+    async for attendee in attendees_cursor:
+        attendees.append(attendee_helper(attendee))
 
-    return dataBase.Events.find_one("attendees", [])
+    return attendees
