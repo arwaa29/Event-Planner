@@ -72,7 +72,7 @@ async def inviteUser(invite_data, inviter_id):
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
 
-    if str(event["organizer"]) != inviter_id:
+    if str(event["organizer_id"]) != inviter_id:
         raise HTTPException(status_code=401, detail="Not authorized to invite users")
 
     if not invite_data.email and not invite_data.username:
