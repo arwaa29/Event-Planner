@@ -1,10 +1,8 @@
-def response_helper(response) -> dict:
-    attendees = response.get("attendees")
-    attend = []
-    for i in attendees:
-        attend.append({ "user": i.get("user"),
-        "status": i.get("status"),})
+from bson import ObjectId
+
+def attendee_helper(attendee) -> dict:
 
     return {
-        "attendees": attend
+        "user_id": str(attendee["user_id"]),
+        "status": attendee.get("status", "pending")
     }
