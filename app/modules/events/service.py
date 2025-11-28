@@ -113,5 +113,5 @@ async def deleteEvent(event_id, user_id):
         raise HTTPException(status_code=401, detail="Not authorized to delete this event")
 
     await events_collection.delete_one({"_id": ObjectId(event_id)})
-    await event_attendees_collection.delete_many({"event_id": event_id})
+    await event_attendees_collection.delete_many({"event_id": str(event_id)})
     return {"message": "Event deleted successfully"}
