@@ -1,27 +1,62 @@
-from app.database import dataBase
-from app.auth.jwt_handler import createAccessToken
+from typing import Optional
+from app.database import events_collection, event_attendees_collection
+from app.modules.events.models import event_helper
+from bson import ObjectId
 
-async def searchByName(title: str):
-    return await dataBase.Events.find({"title":{"$regex": title, "$options": "i"}}).to_list(length=None)
+async def search_events(
+    user_id: str,
+    keyword: Optional[str] = None,
+    date: Optional[str] = None,
+    role: Optional[str] = None
+):
+    events = []
 
-async def searchByTaskDescrip(task: str):
-    return await dataBase.Events.find({"description": {"$regex": task, "$options": "i"}}).to_list(length=None)
+    if role == "organizer":
+        query = {"organizer_id": user_id}
+        if keyword:
+            query["title"] = {"$regex": keyword, "$options": "i"}
+        if date:
+            query["date"] = date
+        cursor = events_collection.find(query)
 
-async def dateFiltering(date: str):
-    return await dataBase.Events.find({"date":{"$regex": date, "$options": "i"}}).to_list(length=None)
+        async for event in cursor:
+            events.append(event_helper(event))
 
-async def userFiltering(role: str):
-    return await dataBase.Events.find({"attendees.role":role}).to_list(length=None)
+    elif role == "attendee":
 
-async def combination(title = None, description = None, date = None, role = None):
+        attendee_cursor = event_attendees_collection.find({
+            "user_id": user_id,
+            "role": "attendee"
+        })
 
-    results = []
+        async for item in attendee_cursor:
+            event = await events_collection.find_one({"_id": ObjectId(item["event_id"])})
+            if event:
 
-    if title:
-        results.append(await searchByName(title))
-    if description:
-        results.append(await searchByTaskDescrip(description))
-    if date:
-        results.append(await dateFiltering(date))
-    if role:
-        results.append(await userFiltering(role))
+                if keyword and keyword.lower() not in event["title"].lower():
+                    continue
+                if date and event["date"] != date:
+                    continue
+                events.append(event_helper(event))
+
+    else:
+        #lw user 3ady
+        organizer_cursor = events_collection.find({"organizer_id": user_id})
+        async for event in organizer_cursor:
+            if keyword and keyword.lower() not in event["title"].lower():
+                continue
+            if date and event["date"] != date:
+                continue
+            events.append(event_helper(event))
+
+        attendee_cursor = event_attendees_collection.find({"user_id": user_id, "role": "attendee"})
+        async for item in attendee_cursor:
+            event = await events_collection.find_one({"_id": ObjectId(item["event_id"])})
+            if event:
+                if keyword and keyword.lower() not in event["title"].lower():
+                    continue
+                if date and event["date"] != date:
+                    continue
+                events.append(event_helper(event))
+
+    return events
