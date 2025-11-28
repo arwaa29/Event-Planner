@@ -2,6 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from app.auth.jwt_handler import verifyAccessToken
 from app.database import dataBase
+from bson import ObjectId
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/users/login")
@@ -29,7 +30,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
     #Fetch user from DB
     #fetch user using user id that we got from token
-    user = await dataBase.users.find_one({"_id": user_id})
+    user = await dataBase.users.find_one({"_id": ObjectId(user_id)})
 
     if not user:
         raise HTTPException(
