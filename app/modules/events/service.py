@@ -109,7 +109,7 @@ async def deleteEvent(event_id, user_id):
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
 
-    if str(event["organiser_id"]) != user_id:
+    if str(event["organizer_id"]) != user_id:
         raise HTTPException(status_code=401, detail="Not authorized to delete this event")
 
     await events_collection.delete_one({"_id": ObjectId(event_id)})
