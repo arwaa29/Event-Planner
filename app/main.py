@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 from app.modules.users.routes import userRouter as user_router
 from app.modules.events.routes import eventRouter as event_router
+from app.modules.responses.routes import responseRouter as response_router
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI(title="EventPlanner API")
@@ -22,6 +23,7 @@ app.add_middleware(
 # include all routers
 app.include_router(user_router)
 app.include_router(event_router)
+app.include_router(response_router)
 
 
 
