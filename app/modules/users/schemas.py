@@ -7,7 +7,7 @@ class Signup(BaseModel):
         email: EmailStr
         username: str
         password: str = Field(..., min_length=6)
-        role: Optional[str] = "attendee"
+
 
 class Login(BaseModel):
     email: Optional[EmailStr] = None
@@ -20,7 +20,7 @@ class userResponse(BaseModel):
     last_name: str
     email: EmailStr
     username: str
-    role: str
+    role: Optional[str] = None
 
 class RegisterResponse(BaseModel):
     message: str
