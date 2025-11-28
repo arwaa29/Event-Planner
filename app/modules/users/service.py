@@ -6,7 +6,7 @@ from typing import Optional
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
-async def signUp(first_name: str, last_name: str, email: str, username: str, password: str,role: str):
+async def signUp(first_name: str, last_name: str, email: str, username: str, password: str):
     user_exit = await dataBase.users.find_one({"email": email})
     if user_exit:
         return {"message": "Email already exists"}
@@ -20,7 +20,7 @@ async def signUp(first_name: str, last_name: str, email: str, username: str, pas
     hashed_pass = pwd_context.hash(password)
     newUser = {"email":email, "first_name":first_name,
                "last_name":last_name, "username":username,
-               "password":hashed_pass, "role":role}
+               "password":hashed_pass, "role": None}
     result = await dataBase.users.insert_one(newUser)
     createdUser = await dataBase.users.find_one({"_id": result.inserted_id})
 
