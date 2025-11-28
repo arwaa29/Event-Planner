@@ -21,6 +21,7 @@ class OrganizedEventResponse(BaseModel):
     description: str
     organizer_id: str
 
+    #3shan el get
     class Config:
         orm_mode = True
         allow_population_by_field_name = True
