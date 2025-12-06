@@ -1,8 +1,8 @@
 from bson import ObjectId
 
-def attendee_helper(attendee) -> dict:
+def attendee_helper(attendee, user) -> dict:
 
     return {
-        "user_id": str(attendee["user_id"]),
+        "username": user["username"],
         "status": attendee.get("status", "pending")
     }
