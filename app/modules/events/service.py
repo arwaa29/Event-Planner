@@ -64,6 +64,25 @@ async def viewInvitedEvent(user_id: str):
 
     return events
 
+async def viewEventsToAttend(user_id: str):
+    events_cursor = event_attendees_collection.find({
+        "user_id": user_id,
+        "role": "attendee",
+        "status": {"$in": ["going", "maybe"]}
+    })
+
+    attendingEvents=[]
+    async for item in events_cursor:
+        event = await events_collection.find_one({"_id": ObjectId(item["event_id"])})
+        if event:
+            attendingEvents.append(event_helper(event,
+                                       attendee_id=user_id,
+                                       status=item.get("status", "pending")))
+
+    return attendingEvents
+
+
+
 
 async def inviteUser(invite_data, inviter_id):
     #hnshof event mwgood wla la
