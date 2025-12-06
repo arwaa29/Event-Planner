@@ -2,6 +2,7 @@ from app.database import dataBase, user_collection
 from passlib.context import CryptContext
 from app.auth.jwt_handler import createAccessToken
 from app.modules.users.models import user_helper
+from bson import ObjectId
 from typing import Optional
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
@@ -46,3 +47,11 @@ async def loginByUsername(username: str, password: str):
     token = createAccessToken({"sub":str(user["_id"])})
     userData = user_helper(user)
     return {"message": "Logged in successfully", "user":userData, "token": token}
+
+async def loginByToken(user_id: str):
+    user = await user_collection.find_one({"_id": ObjectId(user_id)})
+    if user:
+        userData = user_helper(user)
+        return {"message": "Logged in successfully", "user": userData}
+    else:
+        return {"message": "Token expired or invalid"}
