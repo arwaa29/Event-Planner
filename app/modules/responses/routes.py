@@ -1,6 +1,6 @@
 from fastapi import APIRouter , HTTPException, status, Depends
 from app.modules.responses.service import RespondEvent, viewEventAttendees
-from app.modules.responses.schemas import InvitationResponse, AttendeesList
+from app.modules.responses.schemas import InvitationResponse, AttendeesList, AttendeesResponse
 from app.auth.dependencies import get_current_user
 from typing import List
 
@@ -13,7 +13,7 @@ async def satus_api(respond_data: InvitationResponse,
     result = await RespondEvent(respond_data, user_id)
     return result
 
-@responseRouter.post("/attendees", response_model=List[AttendeesList])
+@responseRouter.post("/attendees", response_model=List[AttendeesResponse])
 async def atendees_api(attendee_data: AttendeesList,
                        user:dict = Depends(get_current_user)):
     user_id = str(user["_id"])
