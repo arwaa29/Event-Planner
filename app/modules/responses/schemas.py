@@ -11,3 +11,7 @@ class InvitationResponse(BaseModel):
 
 class AttendeesList(BaseModel):
     event_id: str
+
+class AttendeesResponse(BaseModel):
+    username: str
+    status: str
