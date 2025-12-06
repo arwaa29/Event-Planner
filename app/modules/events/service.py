@@ -50,7 +50,9 @@ async def viewOrganizedEvent(user_id: str):
 async def viewInvitedEvent(user_id: str):
     events_cursor = event_attendees_collection.find({
         "user_id": user_id,
-        "role": "attendee"})
+        "role": "attendee",
+        "status": "pending"
+    })
 
     events = []
 
