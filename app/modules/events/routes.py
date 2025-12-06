@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from app.modules.events.service import createEvent , viewOrganizedEvent, viewInvitedEvent, inviteUser, deleteEvent
+from app.modules.events.service import createEvent, viewOrganizedEvent, viewInvitedEvent, viewEventsToAttend, inviteUser, deleteEvent
 from app.modules.events.schemas import CreateEvent, OrganizedEventResponse, InvitedEventResponse, InvitedUser, DeleteEvent
 from app.auth.dependencies import get_current_user
 from typing import List
@@ -24,6 +24,12 @@ async def organized_events_api(user: dict = Depends(get_current_user)):
 async def invited_events_api(user: dict = Depends(get_current_user)):
     user_id = str(user["_id"])
     result = await viewInvitedEvent(user_id)
+    return result
+
+@eventRouter.get("/events_attend" , response_model=List[InvitedEventResponse])
+async def attended_events_api(user: dict = Depends(get_current_user)):
+    user_id = str(user["_id"])
+    result = await viewEventsToAttend(user_id)
     return result
 
 @eventRouter.post("/invite")
