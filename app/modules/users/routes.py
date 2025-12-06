@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException, status
-from app.modules.users.service import signUp, loginByEmail, loginByUsername
+from fastapi import APIRouter, HTTPException, status, Depends
+from app.modules.users.service import signUp, loginByEmail, loginByUsername, loginByToken
 from app.modules.users.schemas import Signup, Login, userResponse, RegisterResponse, LoginResponse
+from app.auth.dependencies import get_current_user
 
 userRouter = APIRouter(prefix="/users", tags=["Users"])
 
@@ -23,4 +24,10 @@ async def login(request: Login):
 
     if "token" not in result:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=result["message"])
+    return result
+
+@userRouter.post("/login/token")
+async def login_by_token_api(user: dict = Depends(get_current_user)):
+    user_id = str(user["_id"])
+    result = await loginByToken(user_id)
     return result
