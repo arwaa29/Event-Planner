@@ -1,4 +1,4 @@
-from app.database import dataBase, event_attendees_collection, events_collection
+from app.database import dataBase, event_attendees_collection, events_collection, user_collection
 from bson import ObjectId
 from fastapi import HTTPException
 from app.modules.responses.models import attendee_helper
@@ -37,6 +37,9 @@ async def viewEventAttendees(event_id: str, user_id:str):
 
     attendees = []
     async for attendee in attendees_cursor:
-        attendees.append(attendee_helper(attendee))
+        user = await user_collection.find_one({"_id": ObjectId(attendee["user_id"])})
+
+        attendees.append(attendee_helper(attendee, user))
 
     return attendees
+
